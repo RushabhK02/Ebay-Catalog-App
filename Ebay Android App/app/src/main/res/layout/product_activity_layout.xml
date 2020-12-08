@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="ebay_app.ebay_product_search.ProductDetailActivity">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/product_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" >
+        <android.support.design.widget.TabLayout
+            android:id="@+id/product_tabs"
+            android:layout_width="match_parent"
+            android:layout_height="57dp"
+            android:backgroundTint="@color/app_orange_accent"
+            app:tabIconTint="@color/app_blue_eBay"
+            app:tabTextColor="@color/app_blue_eBay" />
+    </android.support.v4.view.ViewPager>
+</android.support.design.widget.CoordinatorLayout>

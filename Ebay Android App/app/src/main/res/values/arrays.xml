@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="search_sort_categories">
+        <item>Best Match</item>
+        <item>Price: highest first</item>
+        <item>Price + Shipping: Highest first</item>
+        <item>Price + Shipping: Lowest first</item>
+    </string-array>
+
+    <string-array name="search_sort_categories_id">
+        <item>BestMatch</item>
+        <item>CurrentPriceHighest</item>
+        <item>PricePlusShippingHighest</item>
+        <item>PricePlusShippingLowest</item>
+    </string-array>
+
+</resources>

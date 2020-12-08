@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <!-- remove this if not needed -->
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"> 
+  <link rel="icon" href="data:;base64,=">
+  <title>Homework 6</title>
+  <style>
+    .heading {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+     
+    }
+
+    .column {
+      box-sizing: border-box;
+      float: left;
+      padding: 5px;
+    }
+
+    .left {
+      width: 25%;
+    }
+
+    .right {
+      width: 75%;
+      text-align: start;
+    }
+
+    .row:after {
+      content: "";
+      display: table;
+      clear: both;
+    }
+
+    .row:hover {
+      box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+    }
+    .row {
+      margin: 0;
+      padding:0px 10px;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      border: 1px solid black;
+    }
+
+    .item-desc-alignment {
+      padding-left: 0;
+      margin: 0;
+      text-align:start;
+    }
+
+    .form-container {
+      width: 500px;
+      height: auto;
+      margin: auto;
+      border: 1px solid black;
+    }
+    
+    .items-container {
+      width: 700px;
+      height: auto;
+    }
+
+    .center {
+      display: table-cell;
+      /* height: 400px; */
+      vertical-align: middle;
+    }
+
+    .redirect {
+      transition: .5s ease;
+      opacity: 0.5;
+    }
+
+    .redirect:hover {
+      transition: .5s ease;
+      opacity: 1;
+    }
+
+    .img-hover-zoom--point-zoom img {
+      transition: transform 1s, filter .5s ease-out;
+    }
+
+    .img-hover-zoom--point-zoom:hover img {
+      transform: scale(2);
+    }
+
+    #searchCount {
+      /* font-style: italic; */
+      align-self: center;
+      text-align: center;
+      font-weight: bold;
+      margin: auto;
+      /* text-decoration: underline; */
+      margin-top: 0px;
+      margin-bottom: 0px;
+    }
+
+    #items {
+      width: 700px;
+      border-radius: 4px;
+      /* display: block; */
+      transition: .5s;
+      text-align: center;
+      margin: auto;
+    }
+
+    #noOfResults {
+      margin: auto;
+      font-size: large;
+      font-weight: bold;
+    }
+
+    #form {
+      text-align: center;
+    }
+
+    #Reset,#Submit,#showLess,#showMore {
+      margin: 0;
+      background-color: #DAD9DA;
+      border: none;
+      padding: 5px;
+    }
+
+    #Reset:hover,#Submit:hover,#showLess:hover,#showMore:hover {
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+    }
+
+    select {
+      text-align-last:center;
+    }
+
+    h3 {
+      margin-bottom: 0px;
+    }
+  </style>
+  <script>
+     var extra_Cards = "";
+     var text_Search_Cards = "";
+     var count = 0;
+     var extraCount = 0;   
+     var showMoreBtn = "<button  id='showMore' onclick='extraSearchCards();' style='margin: auto;height: 32px;border: white;width: 88px;border-radius: 4px;'>Show More</button>";
+      
+    function setupPage(){
+      let form = document.getElementById("form");
+      form.setAttribute('onsubmit', 'formValidation(); return false;');
+      form.setAttribute('onreset', 'clearSearchFields(); return false;');
+    }
+
+    function clearSearchFields() {
+      document.getElementById('keyword').value = "";
+      document.getElementById('minprice').value = "";
+      document.getElementById('maxprice').value = "";
+
+      document.getElementById('new').checked = false
+      document.getElementById('used').checked = false;
+      document.getElementById('vgood').checked = false;
+      document.getElementById('good').checked = false;
+      document.getElementById('acceptable').checked = false;
+
+      document.getElementById('return').checked = false;
+
+      document.getElementById('free').checked = false;
+      document.getElementById('expedited').checked = false;
+
+      document.getElementById('sort').selectedIndex = 0;
+
+      document.getElementById("items").innerHTML = "";
+      document.getElementById("searchCount").innerHTML = "";
+    }
+
+    function formValidation() {
+      let keyword = document.getElementById('keyword').value;
+
+      let minprice = document.getElementById('minprice').value;
+      let maxprice = document.getElementById('maxprice').value;
+
+      if((minprice!=null && Number(minprice)<0) || (maxprice!=null && Number(maxprice)<0)) {
+        window.alert("Price Range values cannot be negative! Please try a value greater than or equal to 0.0");
+        return;
+      }
+
+      if(minprice!=null && maxprice!=null && Number(minprice)>Number(maxprice)) {
+        window.alert("Oops! Lower price limit cannot be greater than upper price limit! Please try again.")
+        return;
+      }
+
+      let conditionNew = document.getElementById('new').checked;
+      let conditionUsed = document.getElementById('used').checked;
+      let conditionVgood = document.getElementById('vgood').checked;
+      let conditionGood = document.getElementById('good').checked;
+      let conditionAcceptable = document.getElementById('acceptable').checked;
+      let vals = [];
+      if(conditionNew)vals.push("1000");
+      if(conditionUsed)vals.push("3000");
+      if(conditionVgood)vals.push("4000");
+      if(conditionGood)vals.push("5000");
+      if(conditionAcceptable)vals.push("6000");
+      let conditionFilter = (conditionNew || conditionAcceptable || conditionGood || conditionUsed || conditionVgood)? 
+                        "&condition="+vals.join(","):"";
+
+      let sellerReturn = document.getElementById('return').checked;
+
+      let freeShipping = document.getElementById('free').checked;
+      let expeditedShipping = document.getElementById('expedited').checked;
+
+      let sortBy = document.getElementById('sort');
+      let sortCriteria = sortBy.options[sortBy.selectedIndex].value;
+
+      var xmlhttp = new XMLHttpRequest();
+      XMLHttpRequest.responseType = 'json';
+      xmlhttp.onreadystatechange = function () {
+        if (this.readyState == 4) {
+          if (this.status == 200) {
+            let object = this.responseText;
+            let response = JSON.parse(object);
+            // console.log(response);
+            if (response.ack == 'Success') showItems(response, keyword);
+          }
+        }
+      };
+      filters = "keyword=" + keyword + (minprice!=""?"&minprice="+minprice:"")+(maxprice!=""?"&maxprice="+maxprice:"")+"&sort="+sortCriteria+
+                conditionFilter+"&return="+sellerReturn+"&free-shipping="+freeShipping+"&expedited-shipping="+expeditedShipping;
+      xmlhttp.open("GET", "/items?" + filters, true);
+    
+      // console.log("/items?" + filters);
+      xmlhttp.send();
+    }
+
+    function showItems(response, keyword) {
+      
+      let items = response.searchResult;
+      let results = response.paginationOutput.totalEntries[0];
+      
+      if(Number(results) < 1){
+        document.getElementById("items").innerHTML = "";
+        document.getElementById("searchCount").innerHTML = "<br/><p id='noOfResults' style='font-size:25px;'> No Results found </p>";
+      }
+      else {
+        text_Search_Cards = "";
+        extra_Cards = "";
+        count = 0;
+        extraCount = 0;
+
+        document.getElementById("searchCount").innerHTML = results + " Results found for <i>" + keyword + "</i><hr style='width:700px' />";
+        let i = 0;
+        for (let item of items) {
+          let expandedID = "expanded-"+ i;
+          let heading = item.title[0];
+          let redirectLink = item.viewItemURL[0];
+          let subCategory = item.primaryCategory[0].categoryName[0];
+          let subHeadingElement = "<p style='item-desc-alignment'>Category: <i>" + subCategory + "</i>&nbsp;" + "<a class='redirect' href=" + redirectLink + " target='_blank'><img src='./static/redirect.png' alt='nature' style='height: 15px;width: 15px;object-fit: cover;' onclick='event.stopPropagation();'></img></a></p>"
+              
+          let image = item.galleryURL[0];
+          image = (image == "https://thumbs1.ebaystatic.com/pict/04040_0.jpg")?"./static/ebay_default.jpg":image;
+          let imageElement = "<img src='" + image + "'  alt='nature' style='max-height: 100px;max-width: 150px;object-fit: cover;vertical-align: middle;border: 3px solid #AAA;' />";
+  
+          let price = item.sellingStatus[0].convertedCurrentPrice[0].__value__;
+          let shippingCost = item.shippingInfo[0].shippingServiceCost[0].__value__;
+          let priceElement = "<b>Price: $" + price + ((Number(shippingCost)<0.01)?"":" ( + $"+shippingCost+" for shipping)")+" </b>"
+
+          let condition = item.condition[0].conditionDisplayName[0];
+          let sellerInfo = item.returnsAccepted[0];
+
+          let sellerElement = (sellerInfo == "false") ? "<p style='item-desc-alignment'>Seller <b>does not accept returns</b></p>" : "<p style='item-desc-alignment'>Seller <b>accepts</b> returns</p>";
+
+          let shippingInfo = item.shippingInfo[0].shippingType[0];
+          let expeditedShipping = items[i].shippingInfo[0].expeditedShipping[0];
+          let expeditedShippingElement = (expeditedShipping == "false") ? "" : " -- Expedited Shipping available";
+
+          let shippingElement = "<p style='item-desc-alignment'>"+ ((shippingInfo == "Free") ? "Free Shipping" : "No Free Shipping") + expeditedShippingElement + "</p>";
+
+          let location = items[i].location[0];
+          let locationElement = "<i>" + " From " + location + " </i>";
+
+          let topRatedListing = items[i].topRatedListing[0];
+          let topRatedListingElement = (topRatedListing == "true")?
+                "<img src='./static/topRatedImage.png' style='height: 35px;width: 25px;object-fit: cover;' />":"";
+
+          let conditionElement = "<p style='item-desc-alignment; display:flex; flex-direction:row; align-items:center;'>Condition: " + condition + " &nbsp; " + topRatedListingElement + "</p>";
+
+          if (count < 3) {
+            text_Search_Cards +=
+              "<div id=" + i + " onclick='maximizeCard(" + i + ");' class='row' style='background-color: #f4f3f4;margin-bottom: 3px;'>" +
+              "<div class='column left center img-hover-zoom--point-zoom'>" + imageElement +"</div>" +
+              "<div class='column right'>" +
+              "<a class='redirect' href=" + redirectLink + " target='_blank'>" +
+              "<h4 style='white-space: nowrap;overflow: hidden;text-overflow: ellipsis;'>" + heading + "</h4>" + "</a>" +
+              String(subHeadingElement) +
+              String(conditionElement) +
+              "<p style='item-desc-alignment'>"+priceElement +"</p>" +
+              "</div>" +
+              "</div>"+
+
+            "<div id='" + expandedID + "' class='row' style='display:none;background-color: #f4f3f4;margin-bottom: 3px;'>" +
+            "<div class='column left img-hover-zoom--point-zoom'>" + imageElement +"</div>" +
+            "<div class='column right'>" +
+            "<div id='i' onclick='minimizeCard(" + i + ");' style='float:right;color: indigo; cursor: pointer;'>&#x274C;</div>" +
+            "<a class='redirect' href=" + redirectLink + " target='_blank'>" +
+            "<h4 style='item-desc-alignment'>" + heading + "</h4>" + "</a>" +
+            subHeadingElement +
+            conditionElement +
+            sellerElement +
+            shippingElement +
+            "<p style='item-desc-alignment'>" + priceElement + locationElement + "</p>" +
+            "</div></div>";
+            count++;
+        } else {
+          if (extraCount < 7) {
+            extra_Cards += 
+            "<div id=" + i + " onclick='maximizeCard(" + i + ");' class='row' style='background-color: #f4f3f4;margin-bottom: 3px;'>" +
+              "<div class='column left img-hover-zoom--point-zoom'>" + imageElement +"</div>" +
+              "<div class='column right'>" +
+              "<a class='redirect' href=" + redirectLink + " target='_blank'>" +
+              "<h4 style='white-space: nowrap;overflow: hidden;text-overflow: ellipsis;'>" + heading + "</h4>" + "</a>" +
+              subHeadingElement +
+              conditionElement +
+              "<p style='item-desc-alignment'>"+priceElement +"</p>" +
+              "</div>" +
+              "</div>"+
+
+              "<div id=" + expandedID + " class='row' style='display:none;background-color: #f4f3f4;margin-bottom: 3px;'>" +
+              "<div class='column left img-hover-zoom--point-zoom'>" + imageElement +"</div>" +
+              "<div class='column right'>" +
+              "<div id='i' onclick='minimizeCard(" + i + ");' style='float:right;color: indigo; cursor: pointer;'>&#x274C;</div>" +
+              "<a class='redirect' href=" + redirectLink + " target='_blank'>" +
+              "<h4 style='item-desc-alignment'>" + heading + "</h4>" + "</a>" +
+              subHeadingElement +
+              conditionElement +
+              sellerElement +
+              shippingElement +
+              "<p style='item-desc-alignment'>" + priceElement + locationElement + "</p>" +
+              "</div></div>";
+              extraCount++;
+          }
+        }
+        i++;
+      } //for loop end
+
+      document.getElementById("items").innerHTML = text_Search_Cards + ((extraCount>0)?showMoreBtn:"");
+    }
+    // document.getElementById("items").style.display = "block";
+  }
+  
+  function maximizeCard(i) {
+    let expandedID = "expanded-"+ i;
+    document.getElementById(i).style.display = "none";
+    document.getElementById(expandedID).style.display = "flex";
+  }
+
+  function minimizeCard(i) {
+    let expandedID = "expanded-"+ i;
+    document.getElementById(expandedID).style.display = "none";
+    document.getElementById(i).style.display = "flex";
+  }
+
+  function showLessCards() {
+    document.getElementById("items").innerHTML = text_Search_Cards + ((extraCount>0)?showMoreBtn:"");
+    document.getElementById("showMore").style.display = "block";
+    document.getElementById("heading").scrollIntoView({ behavior: 'smooth', block: 'start' });
+    let lessbtn = document.getElementById("showLess");
+  }
+
+  function extraSearchCards() {
+    let all_Cards = text_Search_Cards + extra_Cards + "<button  id='showLess' onclick='showLessCards();' style='margin: auto;height: 32px;border: white;width: 88px;border-radius: 4px;'>Show Less</button><br />";
+    document.getElementById("items").innerHTML = all_Cards;
+    document.getElementById('items').scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }
+  </script>
+
+</head>
+
+<body>
+  <div class="heading" id="heading">
+    <a href="https://www.ebay.com/" target="_blank"><img src="./static/EbayLogo.png" height="70px" width="150px"/></a>
+    <h1>Shopping</h1>
+  </div>
+
+  <div class="form-container">
+    <form id="form" style="margin-top:10px;margin-bottom:10px;">
+      <label style="font-weight:bold" for="keyword">Key Words<span style="color:red">*</span>:&nbsp;</label>
+      <input type="text" name="keyword" id="keyword" required/>
+      <br/>
+      <hr>
+      <label style="font-weight:bold" for="Price">Price Range:</label>
+      <span>&nbsp; From &nbsp;</span>
+      <input type="number" name="minprice" style="width:50px;" id="minprice" />
+      <span>&nbsp; to &nbsp;</span>
+      <input type="number" name="maxprice" style="width:50px;" id="maxprice" /> 
+      <br/>
+      <hr>
+      <label style="font-weight:bold" for="condition">Condition:</label>
+      <input type="checkbox" name="new" id="new" value="New" />
+      <label for="new">New</label>
+      <input type="checkbox" name="used" id="used" value="Used" />
+      <label for="used">Used</label>
+      <input type="checkbox" name="vgood" id="vgood" value="Very Good" />
+      <label for="vgood">Very Good</label>
+      <input type="checkbox" name="good" id="good" value="Good" />
+      <label for="good">Good</label>
+      <input type="checkbox" name="acceptable" id="acceptable" value="Acceptable" />
+      <label for="acceptable">Acceptable</label>
+      <br/>
+      <hr>
+      <label style="font-weight:bold" for="seller">Seller:</label>
+      <input type="checkbox" name="return" id="return" value="Return" />
+      <label for="return">Return Accepted</label>
+      <br/>
+      <hr>
+      <label style="font-weight:bold" for="shipping">Shipping:</label>
+      <input type="checkbox" name="free" id="free" value="Free" />
+      <label for="good">Free</label>&nbsp;
+      <input type="checkbox" name="expedited" id="expedited" value="expedited" />
+      <label for="acceptable">Expedited</label>
+      <br/>
+      <hr>
+      <label style="font-weight:bold" for="sort">Sort by:</label>
+      <select id="sort">
+        <option value="BestMatch" selected>Best Match</option>
+        <option value="CurrentPriceHighest">Price: highest first</option>
+        <option value="PricePlusShippingHighest">Price + Shipping: highest first</option>
+        <option value="PricePlusShippingLowest">Price + Shipping: lowest first</option>
+      </select>
+      <br/>
+      <hr>
+      <!-- <label style="font-weight:bold" for="resultsPerPage">Results Per Page:</label>
+      <select id="resultsPerPage">
+          <option value="5" selected>5</option>
+          <option value="10">10</option>
+          <option value="15">15</option>
+          <option value="20">20</option>
+      </select>
+      <br/>
+      <hr> -->
+      <input type="reset" style="border-radius: 4px;" id="Reset" value="Clear" />
+      <input type="submit" style="border-radius: 4px;" id="Submit" value="Search" />
+    </form>
+  </div>
+  <br />
+  <h2 id="searchCount"></h2>
+  <div id="items" class="items-container">
+    
+    <!-- Items here -->
+  </div>
+
+
+  <script type="text/javascript">
+    setupPage();
+  </script>
+</body>
+
+</html>

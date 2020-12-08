@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        style="@style/SearchHeadingText"
+        android:textStyle="bold"
+        android:layout_marginTop="15dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/search_keyword" />
+
+    <EditText
+        android:id="@+id/search_keyword"
+        style="@style/SearchContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:autofillHints="false"
+        android:hint="@string/search_keyword_hint"
+        android:inputType="text"
+        android:maxLines="1" />
+
+    <TextView
+        android:id="@+id/search_keyword_error"
+        style="@style/SearchErrorText"
+        android:textStyle="italic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/search_keyword_error"
+        android:visibility="gone" />
+
+    <TextView
+        style="@style/SearchHeadingText"
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/search_price" />
+
+    <LinearLayout
+        style="@style/SearchContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/search_minprice"
+            style="@style/SearchNormalText"
+            android:hint="Minimum Price"
+            android:inputType="numberDecimal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:id="@+id/search_maxprice"
+            style="@style/SearchNormalText"
+            android:hint="Maximum Price"
+            android:inputType="numberDecimal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/search_checkbox_start_margin"
+            />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/search_price_error"
+        style="@style/SearchErrorText"
+        android:textStyle="italic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/search_price_error"
+        android:visibility="gone" />
+
+    <TextView
+        style="@style/SearchHeadingText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:text="@string/search_condition" />
+
+    <LinearLayout
+        style="@style/SearchContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/search_top_margin"
+        android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/search_condition_new"
+            style="@style/SearchNormalText"
+            android:textStyle="italic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/search_condition_new" />
+
+        <CheckBox
+            android:id="@+id/search_condition_used"
+            style="@style/SearchNormalText"
+            android:textStyle="italic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/search_checkbox_start_margin"
+            android:text="@string/search_condition_used" />
+
+        <CheckBox
+            android:id="@+id/search_condition_unspecified"
+            style="@style/SearchNormalText"
+            android:textStyle="italic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/search_checkbox_start_margin"
+            android:text="@string/search_condition_unspecified" />
+    </LinearLayout>
+
+    <TextView
+        style="@style/SearchHeadingText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:text="@string/search_sort" />
+
+    <Spinner
+        android:id="@+id/search_sort"
+        style="@style/SearchContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
+        android:hint="@string/search_keyword_hint" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="30dp"
+        android:layout_marginTop="15dp"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <Button
+            android:id="@+id/search_button"
+            style="@style/SearchButtons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_weight="1"
+            android:text="@string/search_button" />
+
+        <Button
+            android:id="@+id/clear_button"
+            style="@style/SearchButtons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/search_clear_button" />
+
+    </LinearLayout>
+</LinearLayout>
